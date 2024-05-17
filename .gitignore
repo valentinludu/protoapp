@@ -138,3 +138,5 @@ dist
 # Production
 /build
 
+# Prisma
+/prisma/generated
