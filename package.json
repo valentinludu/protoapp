@@ -4,8 +4,8 @@
   "private": false,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:analyze": "dotenv -e .env.local -- ANALYZE=true next build",
+    "build": "prisma generate && next build",
+    "build:analyze": "dotenv -e .env -- ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint"
   },
