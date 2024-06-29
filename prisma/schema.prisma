@@ -8,41 +8,53 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
-model Profile {
-  id     String  @id @default(uuid()) @db.Uuid
-  bio    String?
-  userId String  @unique @db.Uuid
-  user   User    @relation(fields: [userId], references: [id])
-}
-
 model User {
-  id             String           @id @default(uuid()) @db.Uuid
-  email          String           @unique
-  name           String?
-  profile        Profile?
-  projectToUsers ProjectToUsers[]
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  onboarded     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
 }
 
-model Project {
-  id             String           @id @default(uuid()) @db.Uuid
-  name           String
-  description    String?
-  prototypes     Prototype[]
-  projectToUsers ProjectToUsers[]
+model Account {
+  id                String   @id @default(uuid())
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  userId            String   @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
-model ProjectToUsers {
-  id        String  @id @default(uuid()) @db.Uuid
-  userId    String  @db.Uuid
-  projectId String  @db.Uuid
-  project   Project @relation(fields: [projectId], references: [id])
-  user      User    @relation(fields: [userId], references: [id])
-
-  @@unique([userId, projectId])
+model Session {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  sessionToken String   @unique
+  expires      DateTime
+  userId       String   @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Prototype {
-  id        String   @id @default(uuid()) @db.Uuid
-  projectId String?  @db.Uuid
-  project   Project? @relation(fields: [projectId], references: [id])
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

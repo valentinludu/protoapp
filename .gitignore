@@ -79,7 +79,7 @@ next-env.d.ts
 .env
 .env.development.local
 .env.test.local
-.env.production.local
+.env.production
 .env.local
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -89,6 +89,7 @@ next-env.d.ts
 # Next.js build output
 .next
 out
+analyze
 
 # Nuxt.js build / generate output
 .nuxt
@@ -135,8 +136,10 @@ dist
 # Vercel
 .vercel
 
+# Prisma
+prisma/generated/
+
 # Production
 /build
 
-# Prisma
-/prisma/generated
+
