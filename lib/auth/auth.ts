@@ -7,6 +7,7 @@ import Slack from "next-auth/providers/slack";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/prisma/prisma";
 import log from "loglevel";
+import type { Provider } from "next-auth/providers";
 
 declare module "next-auth" {
   /**
@@ -26,9 +27,11 @@ declare module "next-auth" {
   }
 }
 
+const providers: Provider[] = [Coinbase, Discord, Google, Slack]; // Mastodon throws url type error;
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [Coinbase, Discord, Google, Mastodon, Slack],
+  providers,
   pages: {
     signIn: "/login",
   },
@@ -45,4 +48,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     //   return session;
     // },
   },
+});
+
+export const providerMap = providers.map((provider) => {
+  if (typeof provider === "function") {
+    const providerData = provider();
+    return { id: providerData.id, name: providerData.name };
+  } else {
+    return { id: provider.id, name: provider.name };
+  }
 });
