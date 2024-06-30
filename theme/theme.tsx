@@ -1,6 +1,7 @@
 "use client";
 import { experimental_extendTheme as extendTheme } from "@mui/material/styles";
 import { roboto } from "@/app/fonts";
+import { primaryTextColor, primaryTextColorDarkMode } from "./colors";
 
 const theme = extendTheme({
   cssVarPrefix: "proto",
@@ -19,10 +20,10 @@ const theme = extendTheme({
         //   default: "#fff",
         //   paper: "#fff",
         // },
-        // text: {
-        //   disabled: primaryTextColor,
-        //   primary: primaryTextColor,
-        // },
+        text: {
+          disabled: primaryTextColor,
+          primary: primaryTextColor,
+        },
         // primary: {
         //   main: blueColor,
         // },
@@ -43,10 +44,10 @@ const theme = extendTheme({
         //   default: backgroundColorDarkMode,
         //   paper: backgroundLightColorDarkMode,
         // },
-        // text: {
-        //   disabled: primaryTextColor,
-        //   primary: primaryTextColorDarkMode,
-        // },
+        text: {
+          disabled: primaryTextColorDarkMode,
+          primary: primaryTextColorDarkMode,
+        },
         // primary: {
         //   main: darkBlueColor,
         //   dark: darken(darkBlueColor, 0.2),
@@ -99,18 +100,21 @@ const theme = extendTheme({
         disableElevation: true,
       },
       styleOverrides: {
+        // outlined: {
+        //   color: "#000",
+        // },
+        outlined: {
+          fontWeight: 400,
+        },
         root: {
           textTransform: "none",
+          borderColor: "divider",
         },
         text: ({ theme, variant, color }) => ({
           "&:hover": {
             backgroundColor: theme.vars.palette.background.paper,
           },
-          color:
-            color ||
-            (variant === "outlined" || variant === "text"
-              ? theme.vars.palette.primary.main
-              : "inherit"),
+          color: color || theme.vars.palette.text.primary,
         }),
       },
     },

@@ -27,6 +27,14 @@ declare module "next-auth" {
   }
 }
 
+const providerIconMap: Record<string, string> = {
+  coinbase: "https://authjs.dev/img/providers/coinbase.svg",
+  discord: "https://authjs.dev/img/providers/discord.svg",
+  google: "https://authjs.dev/img/providers/google.svg",
+  mastodon: "https://authjs.dev/img/providers/mastodon.svg",
+  slack: "https://authjs.dev/img/providers/slack.svg",
+};
+
 const providers: Provider[] = [
   Coinbase,
   Discord,
@@ -52,19 +60,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    session({ session, user }) {
-      // @ts-ignore
-      session.user.onboarded = user.onboarded as boolean | undefined;
-      return session;
-    },
   },
 });
 
 export const providerMap = providers.map((provider) => {
   if (typeof provider === "function") {
     const providerData = provider();
-    return { id: providerData.id, name: providerData.name };
+    return {
+      id: providerData.id,
+      name: providerData.name,
+      image: providerIconMap[providerData.id],
+    };
   } else {
-    return { id: provider.id, name: provider.name };
+    return {
+      id: provider.id,
+      name: provider.name,
+      image: providerIconMap[provider.id],
+    };
   }
 });

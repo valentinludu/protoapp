@@ -6,7 +6,7 @@ import { green } from "@mui/material/colors";
 import Image from "next/image";
 import { ProviderButton } from "./ProviderButton";
 
-export function LoginPage() {
+export function RegisterPage() {
   return (
     <Box
       display="grid"
@@ -22,26 +22,26 @@ export function LoginPage() {
         gap={2}
       >
         <Typography variant="h3" component="h1">
-          Sign In to Proto
+          Signup to Proto
         </Typography>
         <Typography variant="h6" mb={2}>
-          Use any of the following providers to sign in to your account.
+          Get started - it&apos;s free, no credit card needed
         </Typography>
         <Box display="flex" flexDirection="column" gap={2} maxWidth={500}>
           {providerMap.map((provider) => (
             <ProviderButton
               key={provider.id}
               provider={provider}
-              type="signin"
+              type="signup"
             />
           ))}
           <Button
-            href="/signup"
+            href="/login"
             LinkComponent={Link}
             variant="text"
             sx={{ textAlign: "center" }}
           >
-            Don&apos;t have an account? Sign Up!
+            Do you have an account? Sign In!
           </Button>
         </Box>
       </Box>
@@ -56,7 +56,7 @@ export function LoginPage() {
       >
         <Image
           src="/images/login-proto-app.png"
-          alt="Login image artwork"
+          alt="Register image artwork"
           sizes="100vw"
           width={800}
           height={530}
