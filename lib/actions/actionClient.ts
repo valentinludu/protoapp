@@ -1,7 +1,8 @@
-import { cookies, headers } from "next/headers";
 import log from "loglevel";
 import { createSafeActionClient } from "next-safe-action/typeschema";
 import { z } from "zod";
+import { auth } from "../auth/auth";
+import { AuthError, Session } from "next-auth";
 
 export const actionClient = createSafeActionClient({
   defaultValidationErrorsShape: "flattened",
@@ -10,17 +11,27 @@ export const actionClient = createSafeActionClient({
       actionName: z.string(),
     });
   },
-  handleReturnedServerError: (err, utils) => {
-    return { error: err } as { error: any };
+  handleReturnedServerError: (error, utils) => {
+    return {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      cause: error.cause,
+    };
   },
-  handleServerErrorLog(err, utils) {
-    const message = err.message
-      ? "Action error: " + err.message
+  handleServerErrorLog(error, utils) {
+    const context = utils.ctx as {
+      session?: Session | null;
+    } | null;
+    const userId = context?.session?.user?.id as string | undefined;
+    const message = error.message
+      ? "Action error: " + error.message
       : "There was an error in the action";
 
     log.error(message, {
-      error: err,
-      meta: utils.metadata,
+      error,
+      userId,
+      metadata: utils.metadata,
       clientInput: utils.clientInput,
     });
   },
@@ -30,22 +41,17 @@ export const actionClient = createSafeActionClient({
    * Returns the context with the session object.
    */
   .use(async ({ next }) => {
-    // const session = await getIronSession<SessionData>(
-    //   cookies(),
-    //   getIronOptions()
-    // );
-    // const headerList = headers();
-    return next({
-      ctx: null,
-    });
+    const session = await auth();
+
+    return next({ ctx: { session } });
   });
 
 export const authActionClient = actionClient.use(async ({ next, ctx }) => {
-  const userId = "";
+  const session = ctx.session;
 
-  if (!userId) {
-    throw new Error("You are not logged in. Please try to login");
+  if (!session) {
+    throw new AuthError("You are not logged in. Please try to login");
   }
 
-  return next({ ctx });
+  return next({ ctx: { ...ctx, session } });
 });

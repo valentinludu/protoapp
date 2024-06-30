@@ -15,8 +15,8 @@ declare module "next-auth" {
    */
   interface Session {
     user: {
-      /** The user's postal address. */
-      onboarded: boolean;
+      /** Is user onboarded. */
+      onboarded?: boolean;
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
@@ -27,7 +27,16 @@ declare module "next-auth" {
   }
 }
 
-const providers: Provider[] = [Coinbase, Discord, Google, Slack]; // Mastodon throws url type error;
+const providers: Provider[] = [
+  Coinbase,
+  Discord,
+  Google({
+    profile(profile) {
+      return { onboarded: profile.onboarded ?? false, ...profile };
+    },
+  }),
+  Slack,
+]; // Mastodon throws url type error;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -35,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/login",
   },
+  debug: true,
   callbacks: {
     async signIn({ account, profile }) {
       if (account?.provider === "google") {
@@ -42,11 +52,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    // session({ session, user }) {
-    //   log.info(`User ${user.id} has logged in.`);
-
-    //   return session;
-    // },
+    session({ session, user }) {
+      // @ts-ignore
+      session.user.onboarded = user.onboarded as boolean | undefined;
+      return session;
+    },
   },
 });
 

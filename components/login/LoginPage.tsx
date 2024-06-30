@@ -1,8 +1,12 @@
 import "server-only";
+import { useAction } from "next-safe-action/hooks";
 import { signInAction } from "@/lib/auth/actions/signInAction";
 import { providerMap } from "@/lib/auth/auth";
 import { Box, Button, Typography } from "@mui/material";
 import Link from "next/link";
+import { green } from "@mui/material/colors";
+import Image from "next/image";
+import { ProviderButton } from "./ProviderButton";
 
 export function LoginPage() {
   return (
@@ -17,7 +21,6 @@ export function LoginPage() {
         justifyContent="center"
         alignItems="center"
         flexDirection="column"
-        bgcolor="background.default"
         gap={2}
       >
         <Typography variant="h3" component="h1">
@@ -26,24 +29,41 @@ export function LoginPage() {
         <Typography variant="h6" mb={2}>
           Get started - it&apos;s free, no credit card needed
         </Typography>
-        <Box display="flex" flexDirection="column" gap={2} maxWidth={300}>
+        <Box display="flex" flexDirection="column" gap={2} maxWidth={500}>
           {providerMap.map((provider) => (
-            <Button
-              key={provider.id}
-              onClick={async () => {
-                "use server";
-                await signInAction({ providerId: provider.id });
-              }}
-            >
-              Sign in with {provider.name}
-            </Button>
+            <ProviderButton key={provider.id} provider={provider} />
           ))}
-          <Link href="/signup" style={{ textAlign: "center" }}>
+          <Button
+            href="/signup"
+            LinkComponent={Link}
+            variant="text"
+            sx={{ textAlign: "center" }}
+          >
             Don&apos;t have an account? Sign Up!
-          </Link>
+          </Button>
         </Box>
       </Box>
-      <Box></Box>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        flexDirection="column"
+        bgcolor={green[200]}
+        px={10}
+        py={4}
+      >
+        <Image
+          src="/images/login-proto-app.png"
+          alt="Login image artwork"
+          sizes="100vw"
+          width={800}
+          height={530}
+          style={{
+            width: "100%",
+            height: "auto",
+          }}
+        />
+      </Box>
     </Box>
   );
 }
