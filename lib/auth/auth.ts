@@ -40,7 +40,14 @@ const providers: Provider[] = [
   Discord,
   Google({
     profile(profile) {
-      return { onboarded: profile.onboarded ?? false, ...profile };
+      return {
+        id: profile.sub,
+        name: profile.name,
+        email: profile.email,
+        image: profile.picture,
+        emailVerified: profile.email_verified ? new Date() : null,
+        onboarded: false,
+      };
     },
   }),
   Slack,
