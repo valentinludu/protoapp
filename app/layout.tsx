@@ -16,11 +16,11 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Box component="body" bgcolor="grey.100" className={roboto.className}>
-        <AppProviders>
+      <AppProviders>
+        <Box component="body" bgcolor="grey.100" className={roboto.className}>
           <Box component="main">{children}</Box>
-        </AppProviders>
-      </Box>
+        </Box>
+      </AppProviders>
     </html>
   );
 }

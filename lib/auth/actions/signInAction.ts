@@ -7,6 +7,6 @@ import { schema } from "@/lib/auth/actions/schemas/signInSchema";
 export const signInAction = actionClient
   .metadata({ actionName: "signIn" })
   .schema(schema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput }) => {
     await signIn(parsedInput.providerId, { redirectTo: "/dashboard" });
   });

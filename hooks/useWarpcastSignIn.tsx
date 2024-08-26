@@ -1,6 +1,7 @@
 "use client";
 
-import { signOut as signOutAuth, signIn as signInAuth } from "@/lib/auth/auth";
+import { signOutAction } from "@/lib/auth/actions/signoutAction";
+import { warpcastSignInAction } from "@/lib/auth/actions/warpcastSignInAction";
 
 import type { StatusAPIResponse } from "@farcaster/auth-kit";
 import { useSignIn } from "@farcaster/auth-kit";
@@ -25,32 +26,17 @@ export function useWarpcastSignIn({
     return nonce;
   }, []);
 
-  const handleSuccess = useCallback(
-    async (res: StatusAPIResponse) => {
-      const signInResponse = await signInAuth("credentials", {
-        message: res.message,
-        signature: res.signature,
-        username: res.username,
-        name: res.displayName,
-        bio: res.bio,
-        pfp: res.pfpUrl,
-        nonce: res.nonce,
-        redirect: false,
-      });
+  const handleSuccess = useCallback(async (res: StatusAPIResponse) => {
+    const signInResponse = await warpcastSignInAction(res);
 
-      if (!signInResponse || signInResponse.error) {
-        // Don't let farcaster sign in in this case
-        log.error("Failed to sign in with farcaster credentials", {
-          error: signInResponse?.error,
-        });
-        signOutAuth();
-        onError?.(signInResponse.error || "Unknown error");
-        return;
-      }
-      onSuccess?.();
-    },
-    [onError, onSuccess]
-  );
+    if (!signInResponse || signInResponse.serverError?.message) {
+      // Don't let farcaster sign in in this case
+      signOutAction();
+      onError?.(signInResponse?.serverError?.message || "Unknown error");
+      return;
+    }
+    onSuccess?.();
+  }, []);
 
   const signInProps = useSignIn({
     onError,

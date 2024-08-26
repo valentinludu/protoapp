@@ -1,4 +1,5 @@
 "use client";
+
 import { AuthKitProvider, type AuthClientError } from "@farcaster/auth-kit";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/navigation";

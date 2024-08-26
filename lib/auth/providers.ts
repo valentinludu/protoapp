@@ -47,7 +47,7 @@ export const providers: Provider[] = [
         placeholder: "0x0",
       },
       displayName: {
-        label: "Name",
+        label: "DisplayName",
         type: "text",
         placeholder: "0x0",
       },
@@ -56,8 +56,8 @@ export const providers: Provider[] = [
         type: "text",
         placeholder: "0x0",
       },
-      pfp: {
-        label: "Pfp",
+      pfpUrl: {
+        label: "PfpUrl",
         type: "text",
         placeholder: "0x0",
       },
@@ -68,12 +68,12 @@ export const providers: Provider[] = [
       },
     },
     async authorize(credentials) {
-      const farcasterDomain = process.env.DOMAIN;
+      const farcasterDomain = "protoapp-five.vercel.app";
 
       const verifyResponse = await farcasterAppClient.verifySignInMessage({
         message: credentials?.message as string,
         signature: credentials?.signature as `0x${string}`,
-        domain: farcasterDomain!,
+        domain: farcasterDomain,
         nonce: (credentials?.nonce as string) ?? "",
       });
 
@@ -88,7 +88,7 @@ export const providers: Provider[] = [
         farcasterId: fid.toString(),
         name: credentials?.displayName as string | undefined,
         username: credentials?.username as string | undefined,
-        imageUrl: credentials?.pfp as string | undefined,
+        imageUrl: credentials?.pfpUrl as string | undefined,
         bio: credentials?.bio as string | undefined,
       });
 
@@ -97,7 +97,7 @@ export const providers: Provider[] = [
         email,
         farcasterId,
         name: credentials?.displayName as string | undefined,
-        image: credentials?.pfp as string | undefined,
+        image: credentials?.pfpUrl as string | undefined,
       };
     },
   }),

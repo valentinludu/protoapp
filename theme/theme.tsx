@@ -1,5 +1,5 @@
 "use client";
-import { experimental_extendTheme as extendTheme } from "@mui/material/styles";
+import { extendTheme } from "@mui/material/styles";
 import { roboto } from "@/app/fonts";
 import { primaryTextColor, primaryTextColorDarkMode } from "./colors";
 

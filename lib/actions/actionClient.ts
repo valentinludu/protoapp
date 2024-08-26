@@ -1,5 +1,5 @@
 import log from "loglevel";
-import { createSafeActionClient } from "next-safe-action/typeschema";
+import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
 import { auth } from "../auth/auth";
 import { AuthError, Session } from "next-auth";
