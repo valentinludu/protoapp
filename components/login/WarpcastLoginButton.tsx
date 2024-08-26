@@ -44,6 +44,7 @@ function WarpcastLoginButton() {
         color="inherit"
         fullWidth
         sx={{ backgroundColor: "background.default", gap: 1 }}
+        disabled={!url}
       >
         <FarcasterLogo />
         Sign in with Farcaster
