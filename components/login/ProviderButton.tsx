@@ -1,7 +1,6 @@
 "use client";
 import { signInAction } from "@/lib/auth/actions/signInAction";
 import { Button } from "@mui/material";
-import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 
 export function ProviderButton({
@@ -23,15 +22,9 @@ export function ProviderButton({
       onClick={async () => {
         await signInAction({ providerId: provider.id });
       }}
-      sx={{ backgroundColor: "background.default" }}
+      sx={{ backgroundColor: "background.default", gap: 1 }}
     >
-      <Image
-        src={provider.image}
-        alt={provider.name}
-        width={14}
-        height={14}
-        style={{ marginRight: 5 }}
-      />
+      <Image src={provider.image} alt={provider.name} width={20} height={20} />
       {text} with {provider.name}
     </Button>
   );

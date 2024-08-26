@@ -1,10 +1,10 @@
 import "server-only";
-import { providerMap } from "@/lib/auth/auth";
 import { Box, Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { green } from "@mui/material/colors";
 import Image from "next/image";
 import { ProviderButton } from "./ProviderButton";
+import { providerMap } from "@/lib/auth/providers";
 
 export function RegisterPage() {
   return (

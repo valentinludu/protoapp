@@ -1,13 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth";
-import Coinbase from "next-auth/providers/coinbase";
-import Discord from "next-auth/providers/discord";
-import Google from "next-auth/providers/google";
-import Mastodon from "next-auth/providers/mastodon";
-import Slack from "next-auth/providers/slack";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/prisma/prisma";
-import log from "loglevel";
-import type { Provider } from "next-auth/providers";
+import { providers } from "./providers";
 
 declare module "next-auth" {
   /**
@@ -17,6 +11,8 @@ declare module "next-auth" {
     user: {
       /** Is user onboarded. */
       onboarded?: boolean;
+      /** Farcaster Id. */
+      farcasterId?: string;
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
@@ -27,37 +23,12 @@ declare module "next-auth" {
   }
 }
 
-const providerIconMap: Record<string, string> = {
-  coinbase: "https://authjs.dev/img/providers/coinbase.svg",
-  discord: "https://authjs.dev/img/providers/discord.svg",
-  google: "https://authjs.dev/img/providers/google.svg",
-  mastodon: "https://authjs.dev/img/providers/mastodon.svg",
-  slack: "https://authjs.dev/img/providers/slack.svg",
-};
-
-const providers: Provider[] = [
-  Coinbase,
-  Discord,
-  Google({
-    profile(profile) {
-      return {
-        id: profile.sub,
-        name: profile.name,
-        email: profile.email,
-        image: profile.picture,
-        emailVerified: profile.email_verified ? new Date() : null,
-        onboarded: false,
-      };
-    },
-  }),
-  Slack,
-]; // Mastodon throws url type error;
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers,
   pages: {
     signIn: "/login",
+    newUser: "/signup",
   },
   debug: true,
   callbacks: {
@@ -68,21 +39,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
   },
-});
-
-export const providerMap = providers.map((provider) => {
-  if (typeof provider === "function") {
-    const providerData = provider();
-    return {
-      id: providerData.id,
-      name: providerData.name,
-      image: providerIconMap[providerData.id],
-    };
-  } else {
-    return {
-      id: provider.id,
-      name: provider.name,
-      image: providerIconMap[provider.id],
-    };
-  }
 });
