@@ -1,6 +1,4 @@
-"use client";
-
-import { signOutAction } from "@/lib/auth/actions/signoutAction";
+import { signOutAction } from "@/lib/auth/actions/signOutAction";
 import { warpcastSignInAction } from "@/lib/auth/actions/warpcastSignInAction";
 
 import type { StatusAPIResponse } from "@farcaster/auth-kit";
