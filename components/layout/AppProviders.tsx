@@ -7,7 +7,7 @@ import { SessionProvider } from "next-auth/react";
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
-      <AppRouterCacheProvider>
+      <AppRouterCacheProvider options={{ key: "proto" }}>
         <ThemeProvider theme={theme}>{children}</ThemeProvider>
       </AppRouterCacheProvider>
     </SessionProvider>

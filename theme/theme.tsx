@@ -1,4 +1,5 @@
 "use client";
+
 import { extendTheme } from "@mui/material/styles";
 import { roboto } from "@/app/fonts";
 import { primaryTextColor, primaryTextColorDarkMode } from "./colors";
