@@ -14,6 +14,6 @@ interface AuthKitConfig {
 export const warpcastConfig: AuthKitConfig = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl: "https://mainnet.optimism.io",
-  domain: process.env.DOMAIN || "farcaster.xyz",
+  domain: process.env.DOMAIN,
   siweUri: "https://app.protoapp.io/login",
 } as const;

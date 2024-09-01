@@ -49,9 +49,9 @@ export const actionClient = createSafeActionClient({
 export const authActionClient = actionClient.use(async ({ next, ctx }) => {
   const session = ctx.session;
 
-  if (!session) {
+  if (!session?.user) {
     throw new AuthError("You are not logged in. Please try to login");
   }
 
-  return next({ ctx: { ...ctx, session } });
+  return next({ ctx });
 });

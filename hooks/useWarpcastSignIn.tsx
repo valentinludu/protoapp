@@ -1,11 +1,10 @@
-import { signOutAction } from "@/lib/auth/actions/signOutAction";
-import { warpcastSignInAction } from "@/lib/auth/actions/warpcastSignInAction";
-
+import { signIn as signInWithCredentials, signOut } from "next-auth/react";
 import type { StatusAPIResponse } from "@farcaster/auth-kit";
 import { useSignIn } from "@farcaster/auth-kit";
 import log from "loglevel";
 import { getCsrfToken } from "next-auth/react";
 import { useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export function useWarpcastSignIn({
   onError,
@@ -13,9 +12,10 @@ export function useWarpcastSignIn({
   onClick,
 }: {
   onSuccess?: () => Promise<void>;
-  onError?: (error: any) => void;
+  onError?: (error: any) => Promise<void>;
   onClick?: () => void;
 }) {
+  const router = useRouter();
   const getNonce = useCallback(async () => {
     const nonce = await getCsrfToken();
     if (!nonce) {
@@ -24,17 +24,30 @@ export function useWarpcastSignIn({
     return nonce;
   }, []);
 
-  const handleSuccess = useCallback(async (res: StatusAPIResponse) => {
-    const signInResponse = await warpcastSignInAction(res);
+  const logOut = useCallback(async () => {
+    await signOut();
+    router.push("/login");
+  }, [router]);
 
-    if (!signInResponse || signInResponse.serverError?.message) {
-      // Don't let farcaster sign in in this case
-      signOutAction();
-      onError?.(signInResponse?.serverError?.message || "Unknown error");
-      return;
-    }
-    onSuccess?.();
-  }, []);
+  const handleSuccess = useCallback(
+    async (res: StatusAPIResponse) => {
+      const signInResponse = await signInWithCredentials("farcaster", {
+        ...res,
+        redirect: false,
+      });
+
+      if (!signInResponse || signInResponse.error) {
+        // Don't let farcaster sign in in this case
+        await onError?.(signInResponse?.error || "Unknown error");
+        await logOut();
+        return;
+      } else {
+        await onSuccess?.();
+        router.push("/dashboard");
+      }
+    },
+    [logOut]
+  );
 
   const signInProps = useSignIn({
     onError,

@@ -6,8 +6,11 @@ import Mastodon from "next-auth/providers/mastodon";
 import Slack from "next-auth/providers/slack";
 import type { Provider } from "next-auth/providers";
 
-import { upsertFarcasterUser } from "./upsertFarcasteruser";
+import { upsertFarcasterUser } from "../user/upsertFarcasteruser";
 import { farcasterAppClient } from "./farcasterClient";
+import { warpcastSchema } from "./actions/schemas/warpcastSignInSchema";
+import { isHex } from "viem";
+import { getUser } from "../user/getUser";
 
 export const providers: Provider[] = [
   Coinbase,
@@ -26,55 +29,88 @@ export const providers: Provider[] = [
   }),
   Slack,
   CredentialsProvider({
+    id: "farcaster",
     name: "Farcaster",
     credentials: {
+      state: {
+        label: "State",
+        type: "text",
+      },
+      url: {
+        label: "Url",
+        type: "text",
+      },
       message: {
         label: "Message",
         type: "text",
-        placeholder: "0x0",
       },
       signature: {
         label: "Signature",
         type: "text",
-        placeholder: "0x0",
       },
-      // In a production app with a server, these should be fetched from
-      // your Farcaster data indexer rather than have them accepted as part
-      // of credentials.
+      fid: {
+        label: "FarcasterId",
+        type: "text",
+      },
       username: {
         label: "Username",
         type: "text",
-        placeholder: "0x0",
       },
       displayName: {
         label: "DisplayName",
         type: "text",
-        placeholder: "0x0",
       },
       bio: {
         label: "Bio",
         type: "text",
-        placeholder: "0x0",
       },
       pfpUrl: {
         label: "PfpUrl",
         type: "text",
-        placeholder: "0x0",
+      },
+      custody: {
+        label: "Custody",
+        type: "text",
       },
       nonce: {
         label: "Nonce",
         type: "text",
-        placeholder: "0x0",
+      },
+      verifications: {
+        label: "Verifications",
+        type: "array",
+      },
+      signatureParams: {
+        label: "SignatureParams",
+        type: "object",
+      },
+      metadata: {
+        label: "Metadata",
+        type: "json",
       },
     },
-    async authorize(credentials) {
-      const farcasterDomain = "protoapp-five.vercel.app";
+    async authorize(_credentials) {
+      const domain = process.env.DOMAIN;
+
+      if (!domain) {
+        return null;
+      }
+
+      const credentials = await warpcastSchema.parseAsync(_credentials);
+
+      const signature = isHex(credentials.signature)
+        ? credentials.signature
+        : null;
+
+      if (!signature) {
+        return null;
+      }
 
       const verifyResponse = await farcasterAppClient.verifySignInMessage({
-        message: credentials?.message as string,
-        signature: credentials?.signature as `0x${string}`,
-        domain: farcasterDomain,
-        nonce: (credentials?.nonce as string) ?? "",
+        message: credentials.message,
+        signature: signature,
+        domain: domain,
+        nonce: credentials.nonce,
       });
 
       const { success, fid } = verifyResponse;
@@ -82,22 +118,34 @@ export const providers: Provider[] = [
       if (!success) {
         return null;
       }
+      const user = await getUser({ farcasterId: fid.toString() });
 
-      // Create or update the user in our database
-      const { id, email, farcasterId } = await upsertFarcasterUser({
+      if (user) {
+        return {
+          id: user.id,
+          email: user.email,
+          farcasterId: user.farcasterId,
+          name: user.name,
+          image: user.image,
+        };
+      }
+
+      const name = credentials.username || credentials.displayName;
+      const image = credentials?.pfpUrl;
+      const farcasterId = fid.toString();
+
+      const { id, email } = await upsertFarcasterUser({
         farcasterId: fid.toString(),
-        name: credentials?.displayName as string | undefined,
-        username: credentials?.username as string | undefined,
-        imageUrl: credentials?.pfpUrl as string | undefined,
-        bio: credentials?.bio as string | undefined,
+        name: name,
+        image: image,
       });
 
       return {
         id,
         email,
         farcasterId,
-        name: credentials?.displayName as string | undefined,
-        image: credentials?.pfpUrl as string | undefined,
+        name: name,
+        image: image,
       };
     },
   }),
@@ -113,7 +161,7 @@ const providerIconMap: Record<string, string> = {
 };
 
 export const providerMap = providers
-  .filter((p) => p.options?.name !== "Farcaster")
+  .filter((p) => p.options?.id !== "farcaster")
   .map((provider) => {
     if (typeof provider === "function") {
       const providerData = provider();

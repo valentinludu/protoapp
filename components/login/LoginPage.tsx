@@ -9,6 +9,8 @@ import { providerMap } from "@/lib/auth/providers";
 import { WarpcastLogin } from "./WarpcastLoginButton";
 
 export function LoginPage() {
+  const domain = process.env.DOMAIN;
+
   return (
     <Box
       display="grid"
@@ -37,7 +39,7 @@ export function LoginPage() {
               type="signin"
             />
           ))}
-          <WarpcastLogin />
+          <WarpcastLogin domain={domain} />
           <Button
             href="/signup"
             LinkComponent={Link}

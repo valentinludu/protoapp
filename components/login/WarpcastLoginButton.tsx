@@ -2,7 +2,6 @@
 
 import { AuthKitProvider, type AuthClientError } from "@farcaster/auth-kit";
 import Button from "@mui/material/Button";
-import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { warpcastConfig } from "@/lib/auth/warpcast/config";
@@ -11,18 +10,14 @@ import { useWarpcastSignIn } from "@/hooks/useWarpcastSignIn";
 import { FarcasterLogo } from "./FarcasterLogo";
 
 function WarpcastLoginButton() {
-  const router = useRouter();
-
   const [popupState, setPopupState] = useState(false);
 
   const onSuccessCallback = useCallback(async () => {
     setPopupState(false);
-    router.push("/profile");
   }, []);
 
-  const onErrorCallback = useCallback((err?: AuthClientError) => {
+  const onErrorCallback = useCallback(async (_err?: AuthClientError) => {
     setPopupState(false);
-    router.push("/login");
   }, []);
 
   const onClick = useCallback(() => {
@@ -58,9 +53,9 @@ function WarpcastLoginButton() {
   );
 }
 
-export function WarpcastLogin() {
+export function WarpcastLogin({ domain }: { domain?: string }) {
   return (
-    <AuthKitProvider config={warpcastConfig}>
+    <AuthKitProvider config={{ ...warpcastConfig, domain }}>
       <WarpcastLoginButton />
     </AuthKitProvider>
   );

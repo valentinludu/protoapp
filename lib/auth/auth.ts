@@ -26,17 +26,44 @@ declare module "next-auth" {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers,
+  session: {
+    strategy: "jwt",
+  },
   pages: {
     signIn: "/login",
     newUser: "/signup",
   },
-  debug: true,
   callbacks: {
-    async signIn({ account, profile }) {
+    async signIn({ account, profile, user }) {
       if (account?.provider === "google") {
         return !!profile?.email_verified;
       }
+      if (account?.provider === "farcaster") {
+        // @ts-ignore farcasterId is added above
+        return !!user?.farcasterId;
+      }
       return true;
+    },
+    // session does not exist if strategy is database and adapter is prisma
+    async jwt({ token, account, user, trigger, session }) {
+      if (account) {
+        token.id = user?.id;
+      }
+
+      if (account?.provider === "farcaster") {
+        // @ts-ignore farcasterId is added above
+        token.farcasterId = user?.farcasterId;
+      }
+
+      if (trigger === "update" && session?.email) {
+        token.email = session.email;
+      }
+
+      return token;
+    },
+    async session({ session, user }) {
+      session.user = user;
+      return session;
     },
   },
 });
