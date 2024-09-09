@@ -5,8 +5,12 @@ import { green } from "@mui/material/colors";
 import Image from "next/image";
 import { ProviderButton } from "./ProviderButton";
 import { providerMap } from "@/lib/auth/providers";
+import { WalletLogin } from "./WalletLogin";
+import { WarpcastLogin } from "./WarpcastLoginButton";
 
 export function RegisterPage() {
+  const domain = process.env.DOMAIN;
+
   return (
     <Box
       display="grid"
@@ -24,10 +28,12 @@ export function RegisterPage() {
         <Typography variant="h3" component="h1">
           Signup to Proto
         </Typography>
-        <Typography variant="h6" mb={2}>
+        <Typography variant="subtitle1" mb={2}>
           Get started - it&apos;s free, no credit card needed
         </Typography>
         <Box display="flex" flexDirection="column" gap={2} maxWidth={500}>
+          <WalletLogin type="signin" />
+          <WarpcastLogin domain={domain} type="signin" />
           {providerMap.map((provider) => (
             <ProviderButton
               key={provider.id}

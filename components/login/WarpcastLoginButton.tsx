@@ -9,7 +9,8 @@ import { FarcasterLoginModal } from "./WarpcastModal";
 import { useWarpcastSignIn } from "@/hooks/useWarpcastSignIn";
 import { FarcasterLogo } from "./FarcasterLogo";
 
-function WarpcastLoginButton() {
+function WarpcastLoginButton({ type }: { type: "signin" | "signup" }) {
+  const text = type === "signin" ? "Sign in" : "Sign up";
   const [popupState, setPopupState] = useState(false);
 
   const onSuccessCallback = useCallback(async () => {
@@ -42,7 +43,7 @@ function WarpcastLoginButton() {
         disabled={!url}
       >
         <FarcasterLogo />
-        Sign in with Farcaster
+        {text} with Farcaster
       </Button>
       <FarcasterLoginModal
         open={popupState}
@@ -53,10 +54,16 @@ function WarpcastLoginButton() {
   );
 }
 
-export function WarpcastLogin({ domain }: { domain?: string }) {
+export function WarpcastLogin({
+  domain,
+  ...props
+}: {
+  domain?: string;
+  type: "signin" | "signup";
+}) {
   return (
     <AuthKitProvider config={{ ...warpcastConfig, domain }}>
-      <WarpcastLoginButton />
+      <WarpcastLoginButton {...props} />
     </AuthKitProvider>
   );
 }

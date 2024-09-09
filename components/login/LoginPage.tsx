@@ -7,6 +7,7 @@ import Image from "next/image";
 import { ProviderButton } from "./ProviderButton";
 import { providerMap } from "@/lib/auth/providers";
 import { WarpcastLogin } from "./WarpcastLoginButton";
+import { WalletLogin } from "./WalletLogin";
 
 export function LoginPage() {
   const domain = process.env.DOMAIN;
@@ -28,10 +29,12 @@ export function LoginPage() {
         <Typography variant="h3" component="h1">
           Sign In to Proto
         </Typography>
-        <Typography variant="h6" mb={2}>
+        <Typography variant="subtitle1" mb={2}>
           Use any of the following providers to sign in to your account.
         </Typography>
         <Box display="flex" flexDirection="column" gap={2} maxWidth={500}>
+          <WalletLogin type="signin" />
+          <WarpcastLogin domain={domain} type="signin" />
           {providerMap.map((provider) => (
             <ProviderButton
               key={provider.id}
@@ -39,7 +42,6 @@ export function LoginPage() {
               type="signin"
             />
           ))}
-          <WarpcastLogin domain={domain} />
           <Button
             href="/signup"
             LinkComponent={Link}

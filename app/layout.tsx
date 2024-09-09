@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { roboto } from "./fonts";
-import { AppProviders } from "@/components/layout/AppProviders";
+import { AppProviders } from "@/components/layout/providers/AppProviders";
 import Box from "@mui/material/Box";
 import "@/theme/cssVariables.css";
 

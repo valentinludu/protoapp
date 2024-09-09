@@ -31,20 +31,11 @@ export function useWarpcastSignIn({
 
   const handleSuccess = useCallback(
     async (res: StatusAPIResponse) => {
-      const signInResponse = await signInWithCredentials("farcaster", {
+      await signInWithCredentials("farcaster", {
         ...res,
-        redirect: false,
+        redirect: true,
+        redirectTo: "/dashboard",
       });
-
-      if (!signInResponse || signInResponse.error) {
-        // Don't let farcaster sign in in this case
-        await onError?.(signInResponse?.error || "Unknown error");
-        await logOut();
-        return;
-      } else {
-        await onSuccess?.();
-        router.push("/dashboard");
-      }
     },
     [logOut]
   );

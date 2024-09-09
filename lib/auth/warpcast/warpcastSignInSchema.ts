@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { StatusAPIResponse } from "@farcaster/auth-kit";
 
 export const warpcastSchema = z.object({
   state: z.enum(["pending", "completed"]),

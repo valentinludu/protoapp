@@ -13,6 +13,8 @@ declare module "next-auth" {
       onboarded?: boolean;
       /** Farcaster Id. */
       farcasterId?: string;
+      /** Wallet Address */
+      walletAddress?: string;
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
@@ -42,9 +44,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // @ts-ignore farcasterId is added above
         return !!user?.farcasterId;
       }
+      if (account?.provider === "wallet") {
+        // @ts-ignore walletAddress is added above
+        return !!user?.walletAddress;
+      }
       return true;
     },
-    // session does not exist if strategy is database and adapter is prisma
     async jwt({ token, account, user, trigger, session }) {
       if (account) {
         token.id = user?.id;
@@ -55,12 +60,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.farcasterId = user?.farcasterId;
       }
 
+      if (account?.provider === "wallet") {
+        // @ts-ignore walletAddress is added above
+        token.walletAddress = user?.walletAddress;
+      }
+
       if (trigger === "update" && session?.email) {
         token.email = session.email;
       }
 
       return token;
     },
+    // session does not exist if strategy is database and adapter is prisma
     async session({ session, user }) {
       session.user = user;
       return session;
