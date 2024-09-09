@@ -71,9 +71,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return token;
     },
-    // session does not exist if strategy is database and adapter is prisma
     async session({ session, user }) {
-      session.user = user;
+      if (user) {
+        session.user = user;
+      }
+
       return session;
     },
   },
